@@ -1235,7 +1235,7 @@ inline void btDbvt::rayTestInternal(const btDbvtNode* root,
 	DBVT_CHECKTYPE
 	if (root)
 	{
-		btVector3 resultNormal;
+		//btVector3 resultNormal;
 
 		int depth = 1;
 		int treshold = DOUBLE_STACKSIZE - 2;
@@ -1293,7 +1293,7 @@ inline void btDbvt::rayTest(const btDbvtNode* root,
 
 		btScalar lambda_max = rayDir.dot(rayTo - rayFrom);
 
-		btVector3 resultNormal;
+		//btVector3 resultNormal;
 
 		btAlignedObjectArray<const btDbvtNode*> stack;
 

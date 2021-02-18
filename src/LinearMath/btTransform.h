@@ -35,7 +35,7 @@ btTransform
 
 public:
 	/**@brief No initialization constructor */
-	btTransform() {}
+	btTransform() = default;
 	/**@brief Constructor from btQuaternion (optional btVector3 )
    * @param q Rotation from quaternion 
    * @param c Translation from Vector (default 0,0,0) */

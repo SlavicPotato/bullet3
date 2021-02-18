@@ -162,9 +162,9 @@ btMiniSDF::subdomain(btMultiIndex const& ijk) const
 {
 	btAssert(m_isValid);
 	btVector3 tmp;
-	tmp.m_floats[0] = m_cell_size[0] * (double)ijk.ijk[0];
-	tmp.m_floats[1] = m_cell_size[1] * (double)ijk.ijk[1];
-	tmp.m_floats[2] = m_cell_size[2] * (double)ijk.ijk[2];
+	tmp.mVec128.m128_f32[0] = m_cell_size[0] * (double)ijk.ijk[0];
+	tmp.mVec128.m128_f32[1] = m_cell_size[1] * (double)ijk.ijk[1];
+	tmp.mVec128.m128_f32[2] = m_cell_size[2] * (double)ijk.ijk[2];
 
 	btVector3 origin = m_domain.min() + tmp;
 

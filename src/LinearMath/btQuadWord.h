@@ -49,10 +49,10 @@ protected:
 #else  //__CELLOS_LV2__ __SPU__
 
 #if defined(BT_USE_SSE) || defined(BT_USE_NEON)
-	union {
+	//union {
 		btSimdFloat4 mVec128;
-		btScalar m_floats[4];
-	};
+		//btScalar m_floats[4];
+	//};
 
 public:
 	SIMD_FORCE_INLINE btSimdFloat4 get128() const
@@ -96,33 +96,33 @@ public:
 #endif
 
 	/**@brief Return the x value */
-	SIMD_FORCE_INLINE const btScalar& getX() const { return m_floats[0]; }
+	SIMD_FORCE_INLINE const btScalar& getX() const { return mVec128.m128_f32[0]; }
 	/**@brief Return the y value */
-	SIMD_FORCE_INLINE const btScalar& getY() const { return m_floats[1]; }
+	SIMD_FORCE_INLINE const btScalar& getY() const { return mVec128.m128_f32[1]; }
 	/**@brief Return the z value */
-	SIMD_FORCE_INLINE const btScalar& getZ() const { return m_floats[2]; }
+	SIMD_FORCE_INLINE const btScalar& getZ() const { return mVec128.m128_f32[2]; }
 	/**@brief Set the x value */
-	SIMD_FORCE_INLINE void setX(btScalar _x) { m_floats[0] = _x; };
+	SIMD_FORCE_INLINE void setX(btScalar _x) { mVec128.m128_f32[0] = _x; };
 	/**@brief Set the y value */
-	SIMD_FORCE_INLINE void setY(btScalar _y) { m_floats[1] = _y; };
+	SIMD_FORCE_INLINE void setY(btScalar _y) { mVec128.m128_f32[1] = _y; };
 	/**@brief Set the z value */
-	SIMD_FORCE_INLINE void setZ(btScalar _z) { m_floats[2] = _z; };
+	SIMD_FORCE_INLINE void setZ(btScalar _z) { mVec128.m128_f32[2] = _z; };
 	/**@brief Set the w value */
-	SIMD_FORCE_INLINE void setW(btScalar _w) { m_floats[3] = _w; };
+	SIMD_FORCE_INLINE void setW(btScalar _w) { mVec128.m128_f32[3] = _w; };
 	/**@brief Return the x value */
-	SIMD_FORCE_INLINE const btScalar& x() const { return m_floats[0]; }
+	SIMD_FORCE_INLINE const btScalar& x() const { return mVec128.m128_f32[0]; }
 	/**@brief Return the y value */
-	SIMD_FORCE_INLINE const btScalar& y() const { return m_floats[1]; }
+	SIMD_FORCE_INLINE const btScalar& y() const { return mVec128.m128_f32[1]; }
 	/**@brief Return the z value */
-	SIMD_FORCE_INLINE const btScalar& z() const { return m_floats[2]; }
+	SIMD_FORCE_INLINE const btScalar& z() const { return mVec128.m128_f32[2]; }
 	/**@brief Return the w value */
-	SIMD_FORCE_INLINE const btScalar& w() const { return m_floats[3]; }
+	SIMD_FORCE_INLINE const btScalar& w() const { return mVec128.m128_f32[3]; }
 
 	//SIMD_FORCE_INLINE btScalar&       operator[](int i)       { return (&m_floats[0])[i];	}
 	//SIMD_FORCE_INLINE const btScalar& operator[](int i) const { return (&m_floats[0])[i]; }
 	///operator btScalar*() replaces operator[], using implicit conversion. We added operator != and operator == to avoid pointer comparisons.
-	SIMD_FORCE_INLINE operator btScalar*() { return &m_floats[0]; }
-	SIMD_FORCE_INLINE operator const btScalar*() const { return &m_floats[0]; }
+	SIMD_FORCE_INLINE operator btScalar*() { return &mVec128.m128_f32[0]; }
+	SIMD_FORCE_INLINE operator const btScalar*() const { return &mVec128.m128_f32[0]; }
 
 	SIMD_FORCE_INLINE bool operator==(const btQuadWord& other) const
 	{
@@ -148,10 +148,10 @@ public:
    */
 	SIMD_FORCE_INLINE void setValue(const btScalar& _x, const btScalar& _y, const btScalar& _z)
 	{
-		m_floats[0] = _x;
-		m_floats[1] = _y;
-		m_floats[2] = _z;
-		m_floats[3] = 0.f;
+		mVec128.m128_f32[0] = _x;
+		mVec128.m128_f32[1] = _y;
+		mVec128.m128_f32[2] = _z;
+		mVec128.m128_f32[3] = 0.f;
 	}
 
 	/*		void getValue(btScalar *m) const 
@@ -169,10 +169,10 @@ public:
    */
 	SIMD_FORCE_INLINE void setValue(const btScalar& _x, const btScalar& _y, const btScalar& _z, const btScalar& _w)
 	{
-		m_floats[0] = _x;
-		m_floats[1] = _y;
-		m_floats[2] = _z;
-		m_floats[3] = _w;
+		mVec128.m128_f32[0] = _x;
+		mVec128.m128_f32[1] = _y;
+		mVec128.m128_f32[2] = _z;
+		mVec128.m128_f32[3] = _w;
 	}
 	/**@brief No initialization constructor */
 	SIMD_FORCE_INLINE btQuadWord()
@@ -187,7 +187,7 @@ public:
    */
 	SIMD_FORCE_INLINE btQuadWord(const btScalar& _x, const btScalar& _y, const btScalar& _z)
 	{
-		m_floats[0] = _x, m_floats[1] = _y, m_floats[2] = _z, m_floats[3] = 0.0f;
+		mVec128.m128_f32[0] = _x, mVec128.m128_f32[1] = _y, mVec128.m128_f32[2] = _z, mVec128.m128_f32[3] = 0.0f;
 	}
 
 	/**@brief Initializing constructor
@@ -198,7 +198,7 @@ public:
    */
 	SIMD_FORCE_INLINE btQuadWord(const btScalar& _x, const btScalar& _y, const btScalar& _z, const btScalar& _w)
 	{
-		m_floats[0] = _x, m_floats[1] = _y, m_floats[2] = _z, m_floats[3] = _w;
+		mVec128.m128_f32[0] = _x, mVec128.m128_f32[1] = _y, mVec128.m128_f32[2] = _z, mVec128.m128_f32[3] = _w;
 	}
 
 	/**@brief Set each element to the max of the current values and the values of another btQuadWord

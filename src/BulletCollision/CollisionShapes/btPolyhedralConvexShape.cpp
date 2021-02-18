@@ -402,7 +402,7 @@ btVector3 btPolyhedralConvexShape::localGetSupportingVertexWithoutMargin(const b
 		vec *= rlen;
 	}
 
-	btVector3 vtx;
+	//btVector3 vtx;
 	btScalar newDot;
 
 	for (int k = 0; k < getNumVertices(); k += 128)
@@ -428,7 +428,7 @@ void btPolyhedralConvexShape::batchedUnitVectorGetSupportingVertexWithoutMargin(
 #ifndef __SPU__
 	int i;
 
-	btVector3 vtx;
+	//btVector3 vtx;
 	btScalar newDot;
 
 	for (i = 0; i < numVectors; i++)
@@ -502,19 +502,20 @@ void btPolyhedralConvexAabbCachingShape::getAabb(const btTransform& trans, btVec
 	getNonvirtualAabb(trans, aabbMin, aabbMax, getMargin());
 }
 
+static const btVector3 s_directions[] =
+	{
+		btVector3(1., 0., 0.),
+		btVector3(0., 1., 0.),
+		btVector3(0., 0., 1.),
+		btVector3(-1., 0., 0.),
+		btVector3(0., -1., 0.),
+		btVector3(0., 0., -1.)};
+
 void btPolyhedralConvexAabbCachingShape::recalcLocalAabb()
 {
 	m_isLocalAabbValid = true;
 
 #if 1
-	static const btVector3 _directions[] =
-		{
-			btVector3(1., 0., 0.),
-			btVector3(0., 1., 0.),
-			btVector3(0., 0., 1.),
-			btVector3(-1., 0., 0.),
-			btVector3(0., -1., 0.),
-			btVector3(0., 0., -1.)};
 
 	btVector3 _supporting[] =
 		{
@@ -525,7 +526,7 @@ void btPolyhedralConvexAabbCachingShape::recalcLocalAabb()
 			btVector3(0., 0., 0.),
 			btVector3(0., 0., 0.)};
 
-	batchedUnitVectorGetSupportingVertexWithoutMargin(_directions, _supporting, 6);
+	batchedUnitVectorGetSupportingVertexWithoutMargin(s_directions, _supporting, 6);
 
 	for (int i = 0; i < 3; ++i)
 	{

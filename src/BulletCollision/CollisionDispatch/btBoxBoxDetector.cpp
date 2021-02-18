@@ -461,7 +461,7 @@ int dBoxBox2(const btVector3& p1, const dMatrix3 R1,
 		{
 			//contact[0].pos[i] = btScalar(0.5)*(pa[i]+pb[i]);
 			//contact[0].depth = *depth;
-			btVector3 pointInWorld;
+			//btVector3 pointInWorld;
 
 #ifdef USE_CENTER_POINT
 			for (i = 0; i < 3; i++)

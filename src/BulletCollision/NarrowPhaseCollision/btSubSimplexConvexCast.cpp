@@ -59,13 +59,13 @@ bool btSubsimplexConvexCast::calcTimeOfImpact(
 	btVector3 n;
 	n.setValue(btScalar(0.), btScalar(0.), btScalar(0.));
 
-	btVector3 c;
+	//btVector3 c;
 
 	btScalar dist2 = v.length2();
 
 
 
-	btVector3 w, p;
+	btVector3 w;
 	btScalar VdotR;
 
 	while ((dist2 > result.m_subSimplexCastEpsilon) && maxIter--)

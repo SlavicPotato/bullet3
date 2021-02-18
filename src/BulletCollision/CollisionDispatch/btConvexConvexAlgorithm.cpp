@@ -238,7 +238,7 @@ struct btPerturbedContactResult : public btManifoldResult
 	{
 		btVector3 endPt, startPt;
 		btScalar newDepth;
-		btVector3 newNormal;
+		//btVector3 newNormal;
 
 		if (m_perturbA)
 		{

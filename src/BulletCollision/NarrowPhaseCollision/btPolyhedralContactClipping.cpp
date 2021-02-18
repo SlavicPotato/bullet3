@@ -304,7 +304,7 @@ bool btPolyhedralContactClipping::findSeparatingAxis(const btConvexPolyhedron& h
 		}
 	}
 
-	btVector3 edgeAstart, edgeAend, edgeBstart, edgeBend;
+	//btVector3 edgeAstart, edgeAend, edgeBstart, edgeBend;
 	int edgeA = -1;
 	int edgeB = -1;
 	btVector3 worldEdgeA;
@@ -466,7 +466,7 @@ void btPolyhedralContactClipping::clipFaceAgainstHull(const btVector3& separatin
 
 	//#define ONLY_REPORT_DEEPEST_POINT
 
-	btVector3 point;
+	//btVector3 point;
 
 	// only keep points that are behind the witness face
 	{

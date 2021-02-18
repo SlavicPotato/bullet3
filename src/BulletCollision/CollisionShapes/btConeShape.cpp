@@ -21,7 +21,7 @@ btConeShape::btConeShape(btScalar radius, btScalar height) : btConvexInternalSha
 {
 	m_shapeType = CONE_SHAPE_PROXYTYPE;
 	setConeUpIndex(1);
-	btVector3 halfExtents;
+	//btVector3 halfExtents;
 	m_sinAngle = (m_radius / btSqrt(m_radius * m_radius + m_height * m_height));
 }
 

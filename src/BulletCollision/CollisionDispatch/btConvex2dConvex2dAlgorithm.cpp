@@ -99,8 +99,8 @@ void btConvex2dConvex2dAlgorithm ::processCollision(const btCollisionObjectWrapp
 	const btConvexShape* min0 = static_cast<const btConvexShape*>(body0Wrap->getCollisionShape());
 	const btConvexShape* min1 = static_cast<const btConvexShape*>(body1Wrap->getCollisionShape());
 
-	btVector3 normalOnB;
-	btVector3 pointOnBWorld;
+	//btVector3 normalOnB;
+	//btVector3 pointOnBWorld;
 
 	{
 		btGjkPairDetector::ClosestPointInput input;
@@ -120,8 +120,8 @@ void btConvex2dConvex2dAlgorithm ::processCollision(const btCollisionObjectWrapp
 
 		gjkPairDetector.getClosestPoints(input, *resultOut, dispatchInfo.m_debugDraw);
 
-		btVector3 v0, v1;
-		btVector3 sepNormalWorldSpace;
+		//btVector3 v0, v1;
+		//btVector3 sepNormalWorldSpace;
 	}
 
 	if (m_ownManifold)

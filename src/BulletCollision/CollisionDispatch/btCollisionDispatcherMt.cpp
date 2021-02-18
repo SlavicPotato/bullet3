@@ -25,10 +25,13 @@ subject to the following restrictions:
 #include "BulletCollision/CollisionDispatch/btCollisionConfiguration.h"
 #include "BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h"
 
+#include <pmmintrin.h>
+
 btCollisionDispatcherMt::btCollisionDispatcherMt(btCollisionConfiguration* config, int grainSize)
 	: btCollisionDispatcher(config)
 {
-	m_batchManifoldsPtr.resize(btGetTaskScheduler()->getNumThreads());
+	m_batchAddManifoldsPtr.resize(btGetTaskScheduler()->getNumThreads());
+	m_batchRemoveManifoldsPtr.resize(btGetTaskScheduler()->getNumThreads());
 	m_batchUpdating = false;
 	m_grainSize = grainSize;  // iterations per task
 }
@@ -68,7 +71,7 @@ btPersistentManifold* btCollisionDispatcherMt::getNewManifold(const btCollisionO
 	}
 	else
 	{
-		m_batchManifoldsPtr[btGetCurrentThreadIndex()].push_back(manifold);
+		m_batchAddManifoldsPtr[btGetCurrentThreadIndex()].push_back(manifold);
 	}
 
 	return manifold;
@@ -87,6 +90,10 @@ void btCollisionDispatcherMt::releaseManifold(btPersistentManifold* manifold)
 		m_manifoldsPtr.swap(findIndex, m_manifoldsPtr.size() - 1);
 		m_manifoldsPtr[findIndex]->m_index1a = findIndex;
 		m_manifoldsPtr.pop_back();
+	} 
+	else
+	{
+		m_batchRemoveManifoldsPtr[btGetCurrentThreadIndex()].push_back(manifold->m_index1a);
 	}
 
 	manifold->~btPersistentManifold();
@@ -116,11 +123,20 @@ struct CollisionDispatcherUpdater : public btIParallelForBody
 	}
 	void forLoop(int iBegin, int iEnd) const
 	{
+		auto daz = _MM_GET_DENORMALS_ZERO_MODE();
+		auto ftz = _MM_GET_FLUSH_ZERO_MODE();
+
+		_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+		_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+
 		for (int i = iBegin; i < iEnd; ++i)
 		{
 			btBroadphasePair* pair = &mPairArray[i];
 			mCallback(*pair, *mDispatcher, *mInfo);
 		}
+
+		_MM_SET_DENORMALS_ZERO_MODE(daz);
+		_MM_SET_FLUSH_ZERO_MODE(ftz);
 	}
 };
 
@@ -131,6 +147,7 @@ void btCollisionDispatcherMt::dispatchAllCollisionPairs(btOverlappingPairCache* 
 	{
 		return;
 	}
+	
 	CollisionDispatcherUpdater updater;
 	updater.mCallback = getNearCallback();
 	updater.mPairArray = pairCache->getOverlappingPairArrayPtr();
@@ -141,12 +158,32 @@ void btCollisionDispatcherMt::dispatchAllCollisionPairs(btOverlappingPairCache* 
 	btParallelFor(0, pairCount, m_grainSize, updater);
 	m_batchUpdating = false;
 
-	// merge new manifolds, if any
-	for (int i = 0; i < m_batchManifoldsPtr.size(); ++i)
+	// deferred removal of manifolds
+	int numBatchRemoveManifoldsPtr = m_batchRemoveManifoldsPtr.size();
+	for (int i = 0; i < numBatchRemoveManifoldsPtr; ++i)
 	{
-		btAlignedObjectArray<btPersistentManifold*>& batchManifoldsPtr = m_batchManifoldsPtr[i];
+		btAlignedObjectArray<int>& batchRemoveManifoldsPtr = m_batchRemoveManifoldsPtr[i];
 
-		for (int j = 0; j < batchManifoldsPtr.size(); ++j)
+		int numBatchRemoveManifolds = batchRemoveManifoldsPtr.size();
+		for (int j = 0; j < numBatchRemoveManifolds; ++j)
+		{
+			int findIndex = batchRemoveManifoldsPtr[j];
+			btAssert(findIndex < m_manifoldsPtr.size());
+			m_manifoldsPtr.swap(findIndex, m_manifoldsPtr.size() - 1);
+			m_manifoldsPtr.pop_back();
+		}
+
+		batchRemoveManifoldsPtr.resizeNoInitialize(0);
+	}
+
+	// merge new manifolds, if any
+	int numBatchAddManifoldsPtr = m_batchAddManifoldsPtr.size();
+	for (int i = 0; i < numBatchAddManifoldsPtr; ++i)
+	{
+		btAlignedObjectArray<btPersistentManifold*>& batchManifoldsPtr = m_batchAddManifoldsPtr[i];
+
+		int numBatchManifolds = batchManifoldsPtr.size();
+		for (int j = 0; j < numBatchManifolds; ++j)
 		{
 			m_manifoldsPtr.push_back(batchManifoldsPtr[j]);
 		}
@@ -155,7 +192,8 @@ void btCollisionDispatcherMt::dispatchAllCollisionPairs(btOverlappingPairCache* 
 	}
 
 	// update the indices (used when releasing manifolds)
-	for (int i = 0; i < m_manifoldsPtr.size(); ++i)
+	int numManifoldsPtr = m_manifoldsPtr.size();
+	for (int i = 0; i < numManifoldsPtr; ++i)
 	{
 		m_manifoldsPtr[i]->m_index1a = i;
 	}

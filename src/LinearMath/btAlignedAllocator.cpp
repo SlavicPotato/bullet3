@@ -61,6 +61,8 @@ static inline void btAlignedFreeDefault(void *ptr)
 
 static inline void *btAlignedAllocDefault(size_t size, int alignment)
 {
+	//return _mm_malloc(size, alignment);
+
 	void *ret;
 	char *real;
 	real = (char *)sAllocFunc(size + sizeof(void *) + (alignment - 1));
@@ -78,6 +80,9 @@ static inline void *btAlignedAllocDefault(size_t size, int alignment)
 
 static inline void btAlignedFreeDefault(void *ptr)
 {
+	//_mm_free(ptr);
+	//return;
+
 	void *real;
 
 	if (ptr)

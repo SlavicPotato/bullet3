@@ -60,7 +60,7 @@ btVector3 btMultiSphereShape::localGetSupportingVertexWithoutMargin(const btVect
 		vec *= rlen;
 	}
 
-	btVector3 vtx;
+	//btVector3 vtx;
 	btScalar newDot;
 
 	const btVector3* pos = &m_localPositionArray[0];
@@ -96,7 +96,7 @@ void btMultiSphereShape::batchedUnitVectorGetSupportingVertexWithoutMargin(const
 
 		const btVector3& vec = vectors[j];
 
-		btVector3 vtx;
+		//btVector3 vtx;
 		btScalar newDot;
 
 		const btVector3* pos = &m_localPositionArray[0];

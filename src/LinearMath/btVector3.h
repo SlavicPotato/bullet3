@@ -95,10 +95,7 @@ public:
 public:
 #else                                            //__CELLOS_LV2__ __SPU__
 #if defined(BT_USE_SSE) || defined(BT_USE_NEON)  // _WIN32 || ARM
-	union {
-		btSimdFloat4 mVec128;
-		btScalar m_floats[4];
-	};
+	btSimdFloat4 mVec128;
 	SIMD_FORCE_INLINE btSimdFloat4 get128() const
 	{
 		return mVec128;
@@ -114,9 +111,7 @@ public:
 
 public:
 	/**@brief No initialization constructor */
-	SIMD_FORCE_INLINE btVector3()
-	{
-	}
+	SIMD_FORCE_INLINE btVector3() = default;
 
 	/**@brief Constructor from scalars 
    * @param x X value
@@ -125,10 +120,10 @@ public:
    */
 	SIMD_FORCE_INLINE btVector3(const btScalar& _x, const btScalar& _y, const btScalar& _z)
 	{
-		m_floats[0] = _x;
-		m_floats[1] = _y;
-		m_floats[2] = _z;
-		m_floats[3] = btScalar(0.f);
+		mVec128.m128_f32[0] = _x;
+		mVec128.m128_f32[1] = _y;
+		mVec128.m128_f32[2] = _z;
+		mVec128.m128_f32[3] = btScalar(0.f);
 	}
 
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
@@ -193,6 +188,7 @@ public:
 #if defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)
 		__m128 vs = _mm_load_ss(&s);  //	(S 0 0 0)
 		vs = bt_pshufd_ps(vs, 0x80);  //	(S S S 0.0)
+		//__m128 vs = _mm_set_ps1(s);
 		mVec128 = _mm_mul_ps(mVec128, vs);
 #elif defined(BT_USE_NEON)
 		mVec128 = vmulq_n_f32(mVec128, s);
@@ -469,14 +465,14 @@ public:
    * Note return values are 0,1,2 for x, y, or z */
 	SIMD_FORCE_INLINE int minAxis() const
 	{
-		return m_floats[0] < m_floats[1] ? (m_floats[0] < m_floats[2] ? 0 : 2) : (m_floats[1] < m_floats[2] ? 1 : 2);
+		return mVec128.m128_f32[0] < mVec128.m128_f32[1] ? (mVec128.m128_f32[0] < mVec128.m128_f32[2] ? 0 : 2) : (mVec128.m128_f32[1] < mVec128.m128_f32[2] ? 1 : 2);
 	}
 
 	/**@brief Return the axis with the largest value 
    * Note return values are 0,1,2 for x, y, or z */
 	SIMD_FORCE_INLINE int maxAxis() const
 	{
-		return m_floats[0] < m_floats[1] ? (m_floats[1] < m_floats[2] ? 2 : 1) : (m_floats[0] < m_floats[2] ? 2 : 0);
+		return mVec128.m128_f32[0] < mVec128.m128_f32[1] ? (mVec128.m128_f32[1] < mVec128.m128_f32[2] ? 2 : 1) : (mVec128.m128_f32[0] < mVec128.m128_f32[2] ? 2 : 0);
 	}
 
 	SIMD_FORCE_INLINE int furthestAxis() const
@@ -558,33 +554,33 @@ public:
 	}
 
 	/**@brief Return the x value */
-	SIMD_FORCE_INLINE const btScalar& getX() const { return m_floats[0]; }
+	SIMD_FORCE_INLINE const btScalar& getX() const { return mVec128.m128_f32[0]; }
 	/**@brief Return the y value */
-	SIMD_FORCE_INLINE const btScalar& getY() const { return m_floats[1]; }
+	SIMD_FORCE_INLINE const btScalar& getY() const { return mVec128.m128_f32[1]; }
 	/**@brief Return the z value */
-	SIMD_FORCE_INLINE const btScalar& getZ() const { return m_floats[2]; }
+	SIMD_FORCE_INLINE const btScalar& getZ() const { return mVec128.m128_f32[2]; }
 	/**@brief Set the x value */
-	SIMD_FORCE_INLINE void setX(btScalar _x) { m_floats[0] = _x; };
+	SIMD_FORCE_INLINE void setX(btScalar _x) { mVec128.m128_f32[0] = _x; };
 	/**@brief Set the y value */
-	SIMD_FORCE_INLINE void setY(btScalar _y) { m_floats[1] = _y; };
+	SIMD_FORCE_INLINE void setY(btScalar _y) { mVec128.m128_f32[1] = _y; };
 	/**@brief Set the z value */
-	SIMD_FORCE_INLINE void setZ(btScalar _z) { m_floats[2] = _z; };
+	SIMD_FORCE_INLINE void setZ(btScalar _z) { mVec128.m128_f32[2] = _z; };
 	/**@brief Set the w value */
-	SIMD_FORCE_INLINE void setW(btScalar _w) { m_floats[3] = _w; };
+	SIMD_FORCE_INLINE void setW(btScalar _w) { mVec128.m128_f32[3] = _w; };
 	/**@brief Return the x value */
-	SIMD_FORCE_INLINE const btScalar& x() const { return m_floats[0]; }
+	SIMD_FORCE_INLINE const btScalar& x() const { return mVec128.m128_f32[0]; }
 	/**@brief Return the y value */
-	SIMD_FORCE_INLINE const btScalar& y() const { return m_floats[1]; }
+	SIMD_FORCE_INLINE const btScalar& y() const { return mVec128.m128_f32[1]; }
 	/**@brief Return the z value */
-	SIMD_FORCE_INLINE const btScalar& z() const { return m_floats[2]; }
+	SIMD_FORCE_INLINE const btScalar& z() const { return mVec128.m128_f32[2]; }
 	/**@brief Return the w value */
-	SIMD_FORCE_INLINE const btScalar& w() const { return m_floats[3]; }
+	SIMD_FORCE_INLINE const btScalar& w() const { return mVec128.m128_f32[3]; }
 
 	//SIMD_FORCE_INLINE btScalar&       operator[](int i)       { return (&m_floats[0])[i];	}
 	//SIMD_FORCE_INLINE const btScalar& operator[](int i) const { return (&m_floats[0])[i]; }
 	///operator btScalar*() replaces operator[], using implicit conversion. We added operator != and operator == to avoid pointer comparisons.
-	SIMD_FORCE_INLINE operator btScalar*() { return &m_floats[0]; }
-	SIMD_FORCE_INLINE operator const btScalar*() const { return &m_floats[0]; }
+	SIMD_FORCE_INLINE operator btScalar*() { return &mVec128.m128_f32[0]; }
+	SIMD_FORCE_INLINE operator const btScalar*() const { return &mVec128.m128_f32[0]; }
 
 	SIMD_FORCE_INLINE bool operator==(const btVector3& other) const
 	{
@@ -639,10 +635,10 @@ public:
 
 	SIMD_FORCE_INLINE void setValue(const btScalar& _x, const btScalar& _y, const btScalar& _z)
 	{
-		m_floats[0] = _x;
-		m_floats[1] = _y;
-		m_floats[2] = _z;
-		m_floats[3] = btScalar(0.f);
+		mVec128.m128_f32[0] = _x;
+		mVec128.m128_f32[1] = _y;
+		mVec128.m128_f32[2] = _z;
+		mVec128.m128_f32[3] = btScalar(0.f);
 	}
 
 	void getSkewSymmetricMatrix(btVector3 * v0, btVector3 * v1, btVector3 * v2) const
@@ -682,7 +678,7 @@ public:
 
 	SIMD_FORCE_INLINE bool isZero() const
 	{
-		return m_floats[0] == btScalar(0) && m_floats[1] == btScalar(0) && m_floats[2] == btScalar(0);
+		return mVec128.m128_f32[0] == btScalar(0) && mVec128.m128_f32[1] == btScalar(0) && mVec128.m128_f32[2] == btScalar(0);
 	}
 
 	SIMD_FORCE_INLINE bool fuzzyZero() const
@@ -822,6 +818,7 @@ operator*(const btVector3& v, const btScalar& s)
 #if defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)
 	__m128 vs = _mm_load_ss(&s);  //	(S 0 0 0)
 	vs = bt_pshufd_ps(vs, 0x80);  //	(S S S 0.0)
+	//__m128 vs = _mm_set_ps1(s);
 	return btVector3(_mm_mul_ps(v.mVec128, vs));
 #elif defined(BT_USE_NEON)
 	float32x4_t r = vmulq_n_f32(v.mVec128, s);
@@ -1026,7 +1023,7 @@ SIMD_FORCE_INLINE long btVector3::maxDot(const btVector3* array, long array_coun
 		return ptIndex;
 	}
 #if (defined BT_USE_SSE && defined BT_USE_SIMD_VECTOR3 && defined BT_USE_SSE_IN_API) || defined(BT_USE_NEON)
-	return _maxdot_large((float*)array, (float*)&m_floats[0], array_count, &dotOut);
+	return _maxdot_large((float*)array, (float*)&mVec128.m128_f32[0], array_count, &dotOut);
 #endif
 }
 
@@ -1066,7 +1063,7 @@ SIMD_FORCE_INLINE long btVector3::minDot(const btVector3* array, long array_coun
 		return ptIndex;
 	}
 #if (defined BT_USE_SSE && defined BT_USE_SIMD_VECTOR3 && defined BT_USE_SSE_IN_API) || defined(BT_USE_NEON)
-	return _mindot_large((float*)array, (float*)&m_floats[0], array_count, &dotOut);
+	return _mindot_large((float*)array, (float*)&mVec128.m128_f32[0], array_count, &dotOut);
 #endif  //BT_USE_SIMD_VECTOR3
 }
 
@@ -1078,7 +1075,7 @@ public:
 	SIMD_FORCE_INLINE btVector4(const btScalar& _x, const btScalar& _y, const btScalar& _z, const btScalar& _w)
 		: btVector3(_x, _y, _z)
 	{
-		m_floats[3] = _w;
+		mVec128.m128_f32[3] = _w;
 	}
 
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
@@ -1115,28 +1112,28 @@ public:
 #endif
 	}
 
-	btScalar getW() const { return m_floats[3]; }
+	btScalar getW() const { return mVec128.m128_f32[3]; }
 
 	SIMD_FORCE_INLINE int maxAxis4() const
 	{
 		int maxIndex = -1;
 		btScalar maxVal = btScalar(-BT_LARGE_FLOAT);
-		if (m_floats[0] > maxVal)
+		if (mVec128.m128_f32[0] > maxVal)
 		{
 			maxIndex = 0;
-			maxVal = m_floats[0];
+			maxVal = mVec128.m128_f32[0];
 		}
-		if (m_floats[1] > maxVal)
+		if (mVec128.m128_f32[1] > maxVal)
 		{
 			maxIndex = 1;
-			maxVal = m_floats[1];
+			maxVal = mVec128.m128_f32[1];
 		}
-		if (m_floats[2] > maxVal)
+		if (mVec128.m128_f32[2] > maxVal)
 		{
 			maxIndex = 2;
-			maxVal = m_floats[2];
+			maxVal = mVec128.m128_f32[2];
 		}
-		if (m_floats[3] > maxVal)
+		if (mVec128.m128_f32[3] > maxVal)
 		{
 			maxIndex = 3;
 		}
@@ -1148,22 +1145,22 @@ public:
 	{
 		int minIndex = -1;
 		btScalar minVal = btScalar(BT_LARGE_FLOAT);
-		if (m_floats[0] < minVal)
+		if (mVec128.m128_f32[0] < minVal)
 		{
 			minIndex = 0;
-			minVal = m_floats[0];
+			minVal = mVec128.m128_f32[0];
 		}
-		if (m_floats[1] < minVal)
+		if (mVec128.m128_f32[1] < minVal)
 		{
 			minIndex = 1;
-			minVal = m_floats[1];
+			minVal = mVec128.m128_f32[1];
 		}
-		if (m_floats[2] < minVal)
+		if (mVec128.m128_f32[2] < minVal)
 		{
 			minIndex = 2;
-			minVal = m_floats[2];
+			minVal = mVec128.m128_f32[2];
 		}
-		if (m_floats[3] < minVal)
+		if (mVec128.m128_f32[3] < minVal)
 		{
 			minIndex = 3;
 		}
@@ -1197,10 +1194,10 @@ public:
    */
 	SIMD_FORCE_INLINE void setValue(const btScalar& _x, const btScalar& _y, const btScalar& _z, const btScalar& _w)
 	{
-		m_floats[0] = _x;
-		m_floats[1] = _y;
-		m_floats[2] = _z;
-		m_floats[3] = _w;
+		mVec128.m128_f32[0] = _x;
+		mVec128.m128_f32[1] = _y;
+		mVec128.m128_f32[2] = _z;
+		mVec128.m128_f32[3] = _w;
 	}
 };
 
@@ -1292,45 +1289,45 @@ SIMD_FORCE_INLINE void btVector3::serializeFloat(struct btVector3FloatData& data
 {
 	///could also do a memcpy, check if it is worth it
 	for (int i = 0; i < 4; i++)
-		dataOut.m_floats[i] = float(m_floats[i]);
+		dataOut.m_floats[i] = float(mVec128.m128_f32[i]);
 }
 
 SIMD_FORCE_INLINE void btVector3::deSerializeFloat(const struct btVector3FloatData& dataIn)
 {
 	for (int i = 0; i < 4; i++)
-		m_floats[i] = btScalar(dataIn.m_floats[i]);
+		mVec128.m128_f32[i] = btScalar(dataIn.m_floats[i]);
 }
 
 SIMD_FORCE_INLINE void btVector3::serializeDouble(struct btVector3DoubleData& dataOut) const
 {
 	///could also do a memcpy, check if it is worth it
 	for (int i = 0; i < 4; i++)
-		dataOut.m_floats[i] = double(m_floats[i]);
+		dataOut.m_floats[i] = double(mVec128.m128_f32[i]);
 }
 
 SIMD_FORCE_INLINE void btVector3::deSerializeDouble(const struct btVector3DoubleData& dataIn)
 {
 	for (int i = 0; i < 4; i++)
-		m_floats[i] = btScalar(dataIn.m_floats[i]);
+		mVec128.m128_f32[i] = btScalar(dataIn.m_floats[i]);
 }
 
 SIMD_FORCE_INLINE void btVector3::serialize(struct btVector3Data& dataOut) const
 {
 	///could also do a memcpy, check if it is worth it
 	for (int i = 0; i < 4; i++)
-		dataOut.m_floats[i] = m_floats[i];
+		dataOut.m_floats[i] = mVec128.m128_f32[i];
 }
 
 SIMD_FORCE_INLINE void btVector3::deSerialize(const struct btVector3FloatData& dataIn)
 {
 	for (int i = 0; i < 4; i++)
-		m_floats[i] = (btScalar)dataIn.m_floats[i];
+		mVec128.m128_f32[i] = (btScalar)dataIn.m_floats[i];
 }
 
 SIMD_FORCE_INLINE void btVector3::deSerialize(const struct btVector3DoubleData& dataIn)
 {
 	for (int i = 0; i < 4; i++)
-		m_floats[i] = (btScalar)dataIn.m_floats[i];
+		mVec128.m128_f32[i] = (btScalar)dataIn.m_floats[i];
 }
 
 #endif  //BT_VECTOR3_H

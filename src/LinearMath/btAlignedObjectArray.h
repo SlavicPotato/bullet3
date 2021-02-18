@@ -270,7 +270,7 @@ public:
 
 		m_size++;
 	}
-
+	
 	/// return the pre-allocated (reserved) elements, this is at least as large as the total number of elements,see size() and reserve()
 	SIMD_FORCE_INLINE int capacity() const
 	{

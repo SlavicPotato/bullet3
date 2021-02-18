@@ -142,9 +142,9 @@ inline void btVec3Copy(btVector3 *v, const btVector3 *w)
 
 inline void ccdVec3Add(btVector3 *v, const btVector3 *w)
 {
-	v->m_floats[0] += w->m_floats[0];
-	v->m_floats[1] += w->m_floats[1];
-	v->m_floats[2] += w->m_floats[2];
+	v->mVec128.m128_f32[0] += w->mVec128.m128_f32[0];
+	v->mVec128.m128_f32[1] += w->mVec128.m128_f32[1];
+	v->mVec128.m128_f32[2] += w->mVec128.m128_f32[2];
 }
 
 inline void ccdVec3Sub(btVector3 *v, const btVector3 *w)
@@ -172,16 +172,16 @@ inline btScalar ccdVec3Dist2(const btVector3 *a, const btVector3 *b)
 
 inline void btVec3Scale(btVector3 *d, btScalar k)
 {
-	d->m_floats[0] *= k;
-	d->m_floats[1] *= k;
-	d->m_floats[2] *= k;
+	d->mVec128.m128_f32[0] *= k;
+	d->mVec128.m128_f32[1] *= k;
+	d->mVec128.m128_f32[2] *= k;
 }
 
 inline void btVec3Cross(btVector3 *d, const btVector3 *a, const btVector3 *b)
 {
-	d->m_floats[0] = (a->m_floats[1] * b->m_floats[2]) - (a->m_floats[2] * b->m_floats[1]);
-	d->m_floats[1] = (a->m_floats[2] * b->m_floats[0]) - (a->m_floats[0] * b->m_floats[2]);
-	d->m_floats[2] = (a->m_floats[0] * b->m_floats[1]) - (a->m_floats[1] * b->m_floats[0]);
+	d->mVec128.m128_f32[0] = (a->mVec128.m128_f32[1] * b->mVec128.m128_f32[2]) - (a->mVec128.m128_f32[2] * b->mVec128.m128_f32[1]);
+	d->mVec128.m128_f32[1] = (a->mVec128.m128_f32[2] * b->mVec128.m128_f32[0]) - (a->mVec128.m128_f32[0] * b->mVec128.m128_f32[2]);
+	d->mVec128.m128_f32[2] = (a->mVec128.m128_f32[0] * b->mVec128.m128_f32[1]) - (a->mVec128.m128_f32[1] * b->mVec128.m128_f32[0]);
 }
 
 inline void btTripleCross(const btVector3 *a, const btVector3 *b,
@@ -785,7 +785,7 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput &inpu
 				// if btDoSimplex returns 1 if objects intersect, -1 if objects don't
 				// intersect and 0 if algorithm should continue
 
-				btVector3 newDir;
+				//btVector3 newDir;
 				int do_simplex_res = btDoSimplex(simplex, &dir);
 
 				if (do_simplex_res == 1)
