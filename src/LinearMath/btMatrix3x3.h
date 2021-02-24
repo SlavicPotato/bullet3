@@ -58,7 +58,7 @@ public:
 	//		explicit btMatrix3x3(const btScalar *m) { setFromOpenGLSubMatrix(m); }
 
 	/**@brief Constructor from Quaternion */
-	explicit btMatrix3x3(const btQuaternion& q) { setRotation(q); }
+	SIMD_FORCE_INLINE explicit btMatrix3x3(const btQuaternion& q) { setRotation(q); }
 	/*
 	template <typename btScalar>
 	Matrix3x3(const btScalar& yaw, const btScalar& pitch, const btScalar& roll)
@@ -67,7 +67,7 @@ public:
 	}
 	*/
 	/** @brief Constructor with row major formatting */
-	btMatrix3x3(const btScalar& xx, const btScalar& xy, const btScalar& xz,
+	SIMD_FORCE_INLINE btMatrix3x3(const btScalar& xx, const btScalar& xy, const btScalar& xz,
 				const btScalar& yx, const btScalar& yy, const btScalar& yz,
 				const btScalar& zx, const btScalar& zy, const btScalar& zz)
 	{
@@ -171,21 +171,21 @@ public:
 	/** @brief Multiply by the target matrix on the right
 	*  @param m Rotation matrix to be applied 
 	* Equivilant to this = this * m */
-	btMatrix3x3& operator*=(const btMatrix3x3& m);
+	SIMD_FORCE_INLINE btMatrix3x3& operator*=(const btMatrix3x3& m);
 
 	/** @brief Adds by the target matrix on the right
 	*  @param m matrix to be applied 
 	* Equivilant to this = this + m */
-	btMatrix3x3& operator+=(const btMatrix3x3& m);
+	SIMD_FORCE_INLINE btMatrix3x3& operator+=(const btMatrix3x3& m);
 
 	/** @brief Substractss by the target matrix on the right
 	*  @param m matrix to be applied 
 	* Equivilant to this = this - m */
-	btMatrix3x3& operator-=(const btMatrix3x3& m);
+	SIMD_FORCE_INLINE btMatrix3x3& operator-=(const btMatrix3x3& m);
 
 	/** @brief Set from the rotational part of a 4x4 OpenGL matrix
 	*  @param m A pointer to the beginning of the array of scalars*/
-	void setFromOpenGLSubMatrix(const btScalar* m)
+	SIMD_FORCE_INLINE void setFromOpenGLSubMatrix(const btScalar* m)
 	{
 		m_el[0].setValue(m[0], m[4], m[8]);
 		m_el[1].setValue(m[1], m[5], m[9]);
@@ -201,7 +201,7 @@ public:
 	*  @param zx Bottom Left
 	*  @param zy Bottom Middle
 	*  @param zz Bottom Right*/
-	void setValue(const btScalar& xx, const btScalar& xy, const btScalar& xz,
+	SIMD_FORCE_INLINE void setValue(const btScalar& xx, const btScalar& xy, const btScalar& xz,
 				  const btScalar& yx, const btScalar& yy, const btScalar& yz,
 				  const btScalar& zx, const btScalar& zy, const btScalar& zz)
 	{
@@ -212,7 +212,7 @@ public:
 
 	/** @brief Set the matrix from a quaternion
 	*  @param q The Quaternion to match */
-	void setRotation(const btQuaternion& q)
+	SIMD_FORCE_INLINE void setRotation(const btQuaternion& q)
 	{
 		btScalar d = q.length2();
 		btFullAssert(d != btScalar(0.0));
@@ -286,7 +286,7 @@ public:
 	*  @param pitch Pitch about X axis
 	*  @param roll Roll about Z axis 
 	*/
-	void setEulerYPR(const btScalar& yaw, const btScalar& pitch, const btScalar& roll)
+	SIMD_FORCE_INLINE void setEulerYPR(const btScalar& yaw, const btScalar& pitch, const btScalar& roll)
 	{
 		setEulerZYX(roll, pitch, yaw);
 	}
@@ -300,7 +300,7 @@ public:
 	* angles are applied in ZYX order. I.e a vector is first rotated 
 	* about X then Y and then Z
 	**/
-	void setEulerZYX(btScalar eulerX, btScalar eulerY, btScalar eulerZ)
+	SIMD_FORCE_INLINE void setEulerZYX(btScalar eulerX, btScalar eulerY, btScalar eulerZ)
 	{
 		///@todo proposed to reverse this since it's labeled zyx but takes arguments xyz and it will match all other parts of the code
 		btScalar ci(btCos(eulerX));
@@ -320,7 +320,7 @@ public:
 	}
 
 	/**@brief Set the matrix to the identity */
-	void setIdentity()
+	SIMD_FORCE_INLINE void setIdentity()
 	{
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
 		m_el[0] = v1000;
@@ -334,7 +334,7 @@ public:
 	}
     
     /**@brief Set the matrix to the identity */
-    void setZero()
+	SIMD_FORCE_INLINE void setZero()
     {
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
         m_el[0] = v0000;
@@ -347,7 +347,7 @@ public:
 #endif
     }
 
-	static const btMatrix3x3& getIdentity()
+	SIMD_FORCE_INLINE static const btMatrix3x3& getIdentity()
 	{
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
 		static const btMatrix3x3
@@ -364,7 +364,7 @@ public:
 
 	/**@brief Fill the rotational part of an OpenGL matrix and clear the shear/perspective
 	* @param m The array to be filled */
-	void getOpenGLSubMatrix(btScalar * m) const
+	SIMD_FORCE_INLINE void getOpenGLSubMatrix(btScalar * m) const
 	{
 #if defined BT_USE_SIMD_VECTOR3 && defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)
 		__m128 v0 = m_el[0].mVec128;
@@ -417,7 +417,7 @@ public:
 
 	/**@brief Get the matrix represented as a quaternion 
 	* @param q The quaternion which will be set */
-	void getRotation(btQuaternion & q) const
+	SIMD_FORCE_INLINE void getRotation(btQuaternion & q) const
 	{
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
 		btScalar trace = m_el[0].x() + m_el[1].y() + m_el[2].z();
@@ -523,7 +523,7 @@ public:
 	* @param yaw Yaw around Y axis
 	* @param pitch Pitch around X axis
 	* @param roll around Z axis */
-	void getEulerYPR(btScalar & yaw, btScalar & pitch, btScalar & roll) const
+	SIMD_FORCE_INLINE void getEulerYPR(btScalar & yaw, btScalar & pitch, btScalar & roll) const
 	{
 		// first use the normal calculus
 		yaw = btScalar(btAtan2(m_el[1].x(), m_el[0].x()));
@@ -550,7 +550,7 @@ public:
 	* @param pitch Pitch around Y axis
 	* @param roll around X axis 
 	* @param solution_number Which solution of two possible solutions ( 1 or 2) are possible values*/
-	void getEulerZYX(btScalar & yaw, btScalar & pitch, btScalar & roll, unsigned int solution_number = 1) const
+	SIMD_FORCE_INLINE void getEulerZYX(btScalar & yaw, btScalar & pitch, btScalar & roll, unsigned int solution_number = 1) const
 	{
 		struct Euler
 		{
@@ -619,7 +619,7 @@ public:
 	/**@brief Create a scaled copy of the matrix 
 	* @param s Scaling vector The elements of the vector will scale each column */
 
-	btMatrix3x3 scaled(const btVector3& s) const
+	SIMD_FORCE_INLINE btMatrix3x3 scaled(const btVector3& s) const
 	{
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
 		return btMatrix3x3(m_el[0] * s, m_el[1] * s, m_el[2] * s);
@@ -645,7 +645,7 @@ public:
 	/// Solve A * x = b, where b is a column vector. This is more efficient
 	/// than computing the inverse in one-shot cases.
 	///Solve33 is from Box2d, thanks to Erin Catto,
-	btVector3 solve33(const btVector3& b) const
+	SIMD_FORCE_INLINE btVector3 solve33(const btVector3& b) const
 	{
 		btVector3 col1 = getColumn(0);
 		btVector3 col2 = getColumn(1);
@@ -663,8 +663,8 @@ public:
 		return x;
 	}
 
-	btMatrix3x3 transposeTimes(const btMatrix3x3& m) const;
-	btMatrix3x3 timesTranspose(const btMatrix3x3& m) const;
+	SIMD_FORCE_INLINE btMatrix3x3 transposeTimes(const btMatrix3x3& m) const;
+	SIMD_FORCE_INLINE btMatrix3x3 timesTranspose(const btMatrix3x3& m) const;
 
 	SIMD_FORCE_INLINE btScalar tdotx(const btVector3& v) const
 	{
@@ -713,7 +713,7 @@ public:
 	*
 	* Note that this matrix is assumed to be symmetric.
 	*/
-	void diagonalize(btMatrix3x3 & rot, btScalar threshold, int maxSteps)
+	SIMD_FORCE_INLINE void diagonalize(btMatrix3x3 & rot, btScalar threshold, int maxSteps)
 	{
 		rot.setIdentity();
 		for (int step = maxSteps; step > 0; step--)
@@ -798,7 +798,7 @@ public:
 	* @param c1 The second column to use for calculating the cofactor
 	* See http://en.wikipedia.org/wiki/Cofactor_(linear_algebra) for more details
 	*/
-	btScalar cofac(int r1, int c1, int r2, int c2) const
+	SIMD_FORCE_INLINE btScalar cofac(int r1, int c1, int r2, int c2) const
 	{
 		return m_el[r1][c1] * m_el[r2][c2] - m_el[r1][c2] * m_el[r2][c1];
 	}

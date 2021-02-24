@@ -77,24 +77,13 @@ btPersistentManifold* btCollisionDispatcherMt::getNewManifold(const btCollisionO
 	return manifold;
 }
 
-void btCollisionDispatcherMt::releaseManifold(btPersistentManifold* manifold)
+void btCollisionDispatcherMt::removeAndFreeManifold(btPersistentManifold* manifold)
 {
-	clearManifold(manifold);
-	//btAssert( !btThreadsAreRunning() );
-	if (!m_batchUpdating)
-	{
-		// batch updater will update manifold pointers array after finishing, so
-		// only need to update array when not batch-updating
-		int findIndex = manifold->m_index1a;
-		btAssert(findIndex < m_manifoldsPtr.size());
-		m_manifoldsPtr.swap(findIndex, m_manifoldsPtr.size() - 1);
-		m_manifoldsPtr[findIndex]->m_index1a = findIndex;
-		m_manifoldsPtr.pop_back();
-	} 
-	else
-	{
-		m_batchRemoveManifoldsPtr[btGetCurrentThreadIndex()].push_back(manifold->m_index1a);
-	}
+	int findIndex = manifold->m_index1a;
+	btAssert(findIndex < m_manifoldsPtr.size());
+	m_manifoldsPtr.swap(findIndex, m_manifoldsPtr.size() - 1);
+	m_manifoldsPtr[findIndex]->m_index1a = findIndex;
+	m_manifoldsPtr.pop_back();
 
 	manifold->~btPersistentManifold();
 	if (m_persistentManifoldPoolAllocator->validPtr(manifold))
@@ -105,6 +94,23 @@ void btCollisionDispatcherMt::releaseManifold(btPersistentManifold* manifold)
 	{
 		btAlignedFree(manifold);
 	}
+}
+
+void btCollisionDispatcherMt::releaseManifold(btPersistentManifold* manifold)
+{
+	clearManifold(manifold);
+	//btAssert( !btThreadsAreRunning() );
+	if (!m_batchUpdating)
+	{
+		// batch updater will update manifold pointers array after finishing, so
+		// only need to update array when not batch-updating
+		removeAndFreeManifold(manifold);
+	} 
+	else
+	{
+		m_batchRemoveManifoldsPtr[btGetCurrentThreadIndex()].push_back(manifold);
+	}
+
 }
 
 struct CollisionDispatcherUpdater : public btIParallelForBody
@@ -162,15 +168,12 @@ void btCollisionDispatcherMt::dispatchAllCollisionPairs(btOverlappingPairCache* 
 	int numBatchRemoveManifoldsPtr = m_batchRemoveManifoldsPtr.size();
 	for (int i = 0; i < numBatchRemoveManifoldsPtr; ++i)
 	{
-		btAlignedObjectArray<int>& batchRemoveManifoldsPtr = m_batchRemoveManifoldsPtr[i];
+		btAlignedObjectArray<btPersistentManifold*>& batchRemoveManifoldsPtr = m_batchRemoveManifoldsPtr[i];
 
 		int numBatchRemoveManifolds = batchRemoveManifoldsPtr.size();
 		for (int j = 0; j < numBatchRemoveManifolds; ++j)
 		{
-			int findIndex = batchRemoveManifoldsPtr[j];
-			btAssert(findIndex < m_manifoldsPtr.size());
-			m_manifoldsPtr.swap(findIndex, m_manifoldsPtr.size() - 1);
-			m_manifoldsPtr.pop_back();
+			removeAndFreeManifold(batchRemoveManifoldsPtr[j]);
 		}
 
 		batchRemoveManifoldsPtr.resizeNoInitialize(0);

@@ -30,8 +30,10 @@ public:
 	virtual void dispatchAllCollisionPairs(btOverlappingPairCache* pairCache, const btDispatcherInfo& info, btDispatcher* dispatcher) BT_OVERRIDE;
 
 protected:
+	void removeAndFreeManifold(btPersistentManifold* manifold);
+
 	btAlignedObjectArray<btAlignedObjectArray<btPersistentManifold*>> m_batchAddManifoldsPtr;
-	btAlignedObjectArray<btAlignedObjectArray<int>> m_batchRemoveManifoldsPtr;
+	btAlignedObjectArray<btAlignedObjectArray<btPersistentManifold*>> m_batchRemoveManifoldsPtr;
 	bool m_batchUpdating;
 	int m_grainSize;
 };

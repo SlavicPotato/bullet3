@@ -79,14 +79,14 @@ public:
 	//		template <typename btScalar>
 	//		explicit Quaternion(const btScalar *v) : Tuple4<btScalar>(v) {}
 	/**@brief Constructor from scalars */
-	btQuaternion(const btScalar& _x, const btScalar& _y, const btScalar& _z, const btScalar& _w)
+	SIMD_FORCE_INLINE btQuaternion(const btScalar& _x, const btScalar& _y, const btScalar& _z, const btScalar& _w)
 		: btQuadWord(_x, _y, _z, _w)
 	{
 	}
 	/**@brief Axis angle Constructor
    * @param axis The axis which the rotation is around
    * @param angle The magnitude of the rotation around the angle (Radians) */
-	btQuaternion(const btVector3& _axis, const btScalar& _angle)
+	SIMD_FORCE_INLINE btQuaternion(const btVector3& _axis, const btScalar& _angle)
 	{
 		setRotation(_axis, _angle);
 	}
@@ -94,7 +94,7 @@ public:
    * @param yaw Angle around Y unless BT_EULER_DEFAULT_ZYX defined then Z
    * @param pitch Angle around X unless BT_EULER_DEFAULT_ZYX defined then Y
    * @param roll Angle around Z unless BT_EULER_DEFAULT_ZYX defined then X */
-	btQuaternion(const btScalar& yaw, const btScalar& pitch, const btScalar& roll)
+	SIMD_FORCE_INLINE btQuaternion(const btScalar& yaw, const btScalar& pitch, const btScalar& roll)
 	{
 #ifndef BT_EULER_DEFAULT_ZYX
 		setEuler(yaw, pitch, roll);
@@ -105,7 +105,7 @@ public:
 	/**@brief Set the rotation using axis angle notation 
    * @param axis The axis around which to rotate
    * @param angle The magnitude of the rotation in Radians */
-	void setRotation(const btVector3& axis, const btScalar& _angle)
+	SIMD_FORCE_INLINE void setRotation(const btVector3& axis, const btScalar& _angle)
 	{
 		btScalar d = axis.length();
 		btAssert(d != btScalar(0.0));
@@ -121,7 +121,7 @@ public:
    * @param yaw Angle around Y
    * @param pitch Angle around X
    * @param roll Angle around Z */
-	void setEuler(const btScalar& yaw, const btScalar& pitch, const btScalar& roll)
+	SIMD_FORCE_INLINE void setEuler(const btScalar& yaw, const btScalar& pitch, const btScalar& roll)
 	{
 		btScalar halfYaw = btScalar(yaw) * btScalar(0.5);
 		btScalar halfPitch = btScalar(pitch) * btScalar(0.5);
@@ -141,7 +141,7 @@ public:
    * @param yaw Angle around Z
    * @param pitch Angle around Y
    * @param roll Angle around X */
-	void setEulerZYX(const btScalar& yawZ, const btScalar& pitchY, const btScalar& rollX)
+	SIMD_FORCE_INLINE void setEulerZYX(const btScalar& yawZ, const btScalar& pitchY, const btScalar& rollX)
 	{
 		btScalar halfYaw = btScalar(yawZ) * btScalar(0.5);
 		btScalar halfPitch = btScalar(pitchY) * btScalar(0.5);
@@ -162,7 +162,7 @@ public:
 	   * @param yaw Angle around Z
 	   * @param pitch Angle around Y
 	   * @param roll Angle around X */
-	void getEulerZYX(btScalar& yawZ, btScalar& pitchY, btScalar& rollX) const
+	SIMD_FORCE_INLINE void getEulerZYX(btScalar& yawZ, btScalar& pitchY, btScalar& rollX) const
 	{
 		btScalar squ;
 		btScalar sqx;
@@ -218,7 +218,7 @@ public:
 
 	/**@brief Subtract out a quaternion
    * @param q The quaternion to subtract from this one */
-	btQuaternion& operator-=(const btQuaternion& q)
+	SIMD_FORCE_INLINE btQuaternion& operator-=(const btQuaternion& q)
 	{
 #if defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)
 		mVec128 = _mm_sub_ps(mVec128, q.mVec128);
@@ -235,7 +235,7 @@ public:
 
 	/**@brief Scale this quaternion
    * @param s The scalar to scale by */
-	btQuaternion& operator*=(const btScalar& s)
+	SIMD_FORCE_INLINE btQuaternion& operator*=(const btScalar& s)
 	{
 #if defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)
 		__m128 vs = _mm_load_ss(&s);  //	(S 0 0 0)
@@ -255,7 +255,7 @@ public:
 	/**@brief Multiply this quaternion by q on the right
    * @param q The other quaternion 
    * Equivilant to this = this * q */
-	btQuaternion& operator*=(const btQuaternion& q)
+	SIMD_FORCE_INLINE btQuaternion& operator*=(const btQuaternion& q)
 	{
 #if defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)
 		__m128 vQ2 = q.get128();
@@ -338,7 +338,7 @@ public:
 	}
 	/**@brief Return the dot product between this quaternion and another
    * @param q The other quaternion */
-	btScalar dot(const btQuaternion& q) const
+	SIMD_FORCE_INLINE btScalar dot(const btQuaternion& q) const
 	{
 #if defined BT_USE_SIMD_VECTOR3 && defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)
 		__m128 vd;
@@ -365,17 +365,17 @@ public:
 	}
 
 	/**@brief Return the length squared of the quaternion */
-	btScalar length2() const
+	SIMD_FORCE_INLINE btScalar length2() const
 	{
 		return dot(*this);
 	}
 
 	/**@brief Return the length of the quaternion */
-	btScalar length() const
+	SIMD_FORCE_INLINE btScalar length() const
 	{
 		return btSqrt(length2());
 	}
-	btQuaternion& safeNormalize()
+	SIMD_FORCE_INLINE btQuaternion& safeNormalize()
 	{
 		btScalar l2 = length2();
 		if (l2 > SIMD_EPSILON)
@@ -386,7 +386,7 @@ public:
 	}
 	/**@brief Normalize the quaternion 
    * Such that x^2 + y^2 + z^2 +w^2 = 1 */
-	btQuaternion& normalize()
+	SIMD_FORCE_INLINE btQuaternion& normalize()
 	{
 #if defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)
 		__m128 vd;
@@ -428,7 +428,7 @@ public:
 
 	/**@brief Return an inversely scaled versionof this quaternion
    * @param s The inverse scale factor */
-	btQuaternion operator/(const btScalar& s) const
+	SIMD_FORCE_INLINE btQuaternion operator/(const btScalar& s) const
 	{
 		btAssert(s != btScalar(0.0));
 		return *this * (btScalar(1.0) / s);
@@ -436,20 +436,20 @@ public:
 
 	/**@brief Inversely scale this quaternion
    * @param s The scale factor */
-	btQuaternion& operator/=(const btScalar& s)
+	SIMD_FORCE_INLINE btQuaternion& operator/=(const btScalar& s)
 	{
 		btAssert(s != btScalar(0.0));
 		return *this *= btScalar(1.0) / s;
 	}
 
 	/**@brief Return a normalized version of this quaternion */
-	btQuaternion normalized() const
+	SIMD_FORCE_INLINE btQuaternion normalized() const
 	{
 		return *this / length();
 	}
 	/**@brief Return the ***half*** angle between this quaternion and the other
    * @param q The other quaternion */
-	btScalar angle(const btQuaternion& q) const
+	SIMD_FORCE_INLINE btScalar angle(const btQuaternion& q) const
 	{
 		btScalar s = btSqrt(length2() * q.length2());
 		btAssert(s != btScalar(0.0));
@@ -458,7 +458,7 @@ public:
 
 	/**@brief Return the angle between this quaternion and the other along the shortest path
 	* @param q The other quaternion */
-	btScalar angleShortestPath(const btQuaternion& q) const
+	SIMD_FORCE_INLINE btScalar angleShortestPath(const btQuaternion& q) const
 	{
 		btScalar s = btSqrt(length2() * q.length2());
 		btAssert(s != btScalar(0.0));
@@ -469,14 +469,14 @@ public:
 	}
 
 	/**@brief Return the angle [0, 2Pi] of rotation represented by this quaternion */
-	btScalar getAngle() const
+	SIMD_FORCE_INLINE btScalar getAngle() const
 	{
 		btScalar s = btScalar(2.) * btAcos(mVec128.m128_f32[3]);
 		return s;
 	}
 
 	/**@brief Return the angle [0, Pi] of rotation represented by this quaternion along the shortest path */
-	btScalar getAngleShortestPath() const
+	SIMD_FORCE_INLINE btScalar getAngleShortestPath() const
 	{
 		btScalar s;
 		if (mVec128.m128_f32[3] >= 0)
@@ -487,7 +487,7 @@ public:
 	}
 
 	/**@brief Return the axis of the rotation represented by this quaternion */
-	btVector3 getAxis() const
+	SIMD_FORCE_INLINE btVector3 getAxis() const
 	{
 		btScalar s_squared = 1.f - mVec128.m128_f32[3] * mVec128.m128_f32[3];
 
@@ -498,7 +498,7 @@ public:
 	}
 
 	/**@brief Return the inverse of this quaternion */
-	btQuaternion inverse() const
+	SIMD_FORCE_INLINE btQuaternion inverse() const
 	{
 #if defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)
 		return btQuaternion(_mm_xor_ps(mVec128, vQInv));
@@ -578,7 +578,7 @@ public:
    * @param q The other quaternion to interpolate with 
    * @param t The ratio between this and q to interpolate.  If t = 0 the result is this, if t=1 the result is q.
    * Slerp interpolates assuming constant velocity.  */
-	btQuaternion slerp(const btQuaternion& q, const btScalar& t) const
+	SIMD_FORCE_INLINE btQuaternion slerp(const btQuaternion& q, const btScalar& t) const
 	{
 		const btScalar magnitude = btSqrt(length2() * q.length2());
 		btAssert(magnitude > btScalar(0));
@@ -609,7 +609,7 @@ public:
 		}
 	}
 
-	static const btQuaternion& getIdentity()
+	SIMD_FORCE_INLINE static const btQuaternion& getIdentity()
 	{
 		static const btQuaternion identityQuat(btScalar(0.), btScalar(0.), btScalar(0.), btScalar(1.));
 		return identityQuat;
